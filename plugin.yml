@@ -1,0 +1,8 @@
+name: Man10vote
+version: 1.0.0
+main: red.man10.Man10vote
+commands:
+  mvote:
+    description: man10vote
+    usage: /<command>
+    default: op
