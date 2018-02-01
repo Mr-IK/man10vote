@@ -43,6 +43,12 @@ public class Scoreboard {
     	}
 		return null;
     }
+    public int getpoint(String name) {
+    	 Objective obj = scoreboard.getObjective(OBJECTIVE_NAME);
+    	 Score score = obj.getScore(name);
+    	 int a =score.getScore();
+		return a;
+    }
     public void addScore(String name, int amount) {
         Objective obj = scoreboard.getObjective(OBJECTIVE_NAME);
         Score score = obj.getScore(name);
@@ -63,7 +69,7 @@ public class Scoreboard {
         }
         scoreboard.clearSlot(DisplaySlot.SIDEBAR);
     }
-    public void removeScores(Scoreboard scoreboard, String name) {
-        ((org.bukkit.scoreboard.Scoreboard) scoreboard).resetScores(name);
+    public void removeScores(String name) {
+    	scoreboard.resetScores(name);
     }
 }

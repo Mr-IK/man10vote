@@ -1,2 +1,4 @@
-#<player_name>��player�̖��O�ɕϊ�����܂��I
-voteuse: 'say <player_name>�����[���܂����I'
+#<player_name>はplayerの名前に変換されます！
+voteuse: 'say <player_name>が投票しました！'
+#<win_name>は一番投票数の多かったものに変換されます！
+voteend: 'say <win_name>が一番多く投票されました！！'
