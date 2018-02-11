@@ -22,7 +22,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-
 public class Man10vote extends JavaPlugin {
 
 	@Override
@@ -43,7 +42,7 @@ public class Man10vote extends JavaPlugin {
 					  p.sendMessage(prefix+count+": §a§l"+v+" §e§l"+b+"§a§l票");
 				  }
 			  }
-			  p.sendMessage("=======§a§kaaa§6§l====v1.0.0====§a§kaaa§r=======");
+			  p.sendMessage("=======§a§kaaa§6§l====v1.2.0====§a§kaaa§r=======");
 			  return true;
 			  } else if(args.length == 1) {
 				  if(vote2.isEmpty()==true) {
@@ -109,7 +108,9 @@ public class Man10vote extends JavaPlugin {
 					     p.sendMessage(" /mvote admin help ==> OP用ヘルプを確認(これ)");
 					     p.sendMessage(" /mvote new 投票内容 項目1 項目2 … ==> 投票を開始");
 					     p.sendMessage(" /mvote admin end ==> 投票を終了");
-					     p.sendMessage("=======§a§kaaa§6§l====v1.0.0====§a§kaaa§r=======");
+					     p.sendMessage(" /mvote admin reload ==> configをリロード");
+					     p.sendMessage(" /mvote log ○○ ==> ログを確認");
+					     p.sendMessage("=======§a§kaaa§6§l====v1.2.0====§a§kaaa§r=======");
 					     return true;
 				        } else if(args[1].equalsIgnoreCase("end")) {
 							  if(vote2.isEmpty()==true) {
@@ -135,7 +136,11 @@ public class Man10vote extends JavaPlugin {
 									  max = ii;
 									  maxs = key;
 								  }else if(max==ii) {
+									  if(maxs==null) {
+										  maxs = key;
+									  }else {
 									  maxs = maxs+","+key;
+									  }
 								  }
 							  }
 							  if(maxs==null) {
@@ -149,33 +154,20 @@ public class Man10vote extends JavaPlugin {
 				    		playerState.clear();
 				        	board.remove();
 				        	list.clear();
+				            config2.set("vote", null);
+				            config2.set("vote.enable", "false");
+				            vote.saveConfig();
 				        	return true;
+				        } else if(args[1].equalsIgnoreCase("reload")) {
+				    		reloadConfig();
+				    	    FileConfiguration config = getConfig();
+				            config1 = config;
+				            vote.reloadConfig();
+				            FileConfiguration config4 = vote.getConfig();
+				            config2 = config4;
+				    		p.sendMessage(prefix + "§avote.ymlとconfig.ymlを再読み込みしました。");
+				    		return true;
 				        }
-				  }else if(args[0].equalsIgnoreCase("add")) {
-				        if(!p.hasPermission("mvote.admin")){
-				            p.sendMessage(prefix + "§4あなたには項目を追加する権限がありません！");
-				            return true;
-				        }
-						  if(vote2.isEmpty()==true) {
-							  p.sendMessage(prefix + "§4現在投票は行われていません！");
-							  return true;
-						  }
-						  if(vote2.get(args[1])!=null) {
-							  p.sendMessage(prefix + "§4同じ内容がすでにあったため追加できませんでした！");
-						  }
-						  vote2.put(args[1], 0);
-						  list.add(args[1]);
-						  int l =list.size();
-						  int m =list.size();
-						  for (int count = 1; count < l; count++){
-							  String v = list.get(count-1);
-							  int b = vote2.get(v);
-							  board.setScore(count+": "+v+" §e"+b+"§a票", m);
-							  m--;
-						  }
-						  board.setScore(list.size()+": "+args[1]+" §e"+0+"§a票", 1);
-				          p.sendMessage(prefix + "§a項目を追加しました。");
-				         return true;
 				  }else if(args[0].equalsIgnoreCase("log")) {
 		              int a = 0;
 		              a = Integer.parseInt(args[1])-1;
@@ -204,7 +196,7 @@ public class Man10vote extends JavaPlugin {
 						  }
 						  }else {
 						  }
-						  	  
+
 					  }
 					  if(c.equals("・")==false) {
 						  p.sendMessage(prefix + c);
@@ -216,8 +208,14 @@ public class Man10vote extends JavaPlugin {
 				            p.sendMessage(prefix + "§4あなたには投票を開始する権限がありません！");
 				            return true;
 				        }
+						  if(vote2.isEmpty()==false) {
+							  p.sendMessage(prefix + "§4現在投票が行われています！");
+							  return true;
+						  }
+				        config2.set("vote.enable", "true");
+				        config2.set("vote.title", args[1].replace("&", "§")+": §e[/mvote]");
 					  board = new Scoreboard();
-					  board.setTitle(args[1]);
+					  board.setTitle(args[1].replace("&", "§")+": §e[/mvote]");
 					  int i = 0;
 					  int l = args.length-2;
 					  for (int count = 2; count < args.length; count++){
@@ -229,15 +227,18 @@ public class Man10vote extends JavaPlugin {
 							  p.sendMessage(prefix + "§42つ以上の同じ内容があったため作成できませんでした！");
 							  return true;
 						  }
-						  vote2.put(args[count], 0);
-						  list.add(args[count]);
-						  board.setScore(i+": "+args[count]+" §e0§a票", l);
+						  vote2.put(args[count].replace("&", "§"), 0);
+						  list.add(args[count].replace("&", "§"));
+						  board.setScore(i+": "+args[count].replace("&", "§")+" §e0§a票", l);
+						  config2.set("vote.a."+i+".key", args[count]);
+						  config2.set("vote.a."+i+".value", 0);
 						  l--;
 					  }
 					  for (Player player : Bukkit.getOnlinePlayers()) {
-						  board.setShowPlayer(player); 
+						  board.setShowPlayer(player);
 					  }
-					  Bukkit.broadcastMessage(prefix+"§a§l投票が開始されました！=>§e§l"+args[1]+" §e§l/mvote");
+					  Bukkit.broadcastMessage(prefix+"§a§l投票が開始されました！=>§e§l"+args[1]+" §e§l[/mvote]");
+					  vote.saveConfig();
 					  return true;
 				  }
 			  }
@@ -246,24 +247,8 @@ public class Man10vote extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-	    if(vote2.isEmpty()==true) {
-		    config2.set("vote.enable", "false");
-			vote.saveConfig();
-			}else {
-			config2.set("vote.enable", "true");
-			config2.set("vote.title", board.getTitle());
-			for (int i = 1; i <= list.size(); i++){
-				String a = list.get(i-1);
-				int b = vote2.get(a);
-				config2.set("vote.a."+i+".key", a);
-				config2.set("vote.a."+i+".value", b);
-			}
-			for (UUID key : playerState.keySet()) {
-                config2.set("vote.player."+key, playerState.get(key));
-			}
-			vote.saveConfig();
-			}
 		reloadConfig();
+		vote.reloadConfig();
 		super.onDisable();
 	}
 	public static FileConfiguration config1;
@@ -293,20 +278,20 @@ public class Man10vote extends JavaPlugin {
             board = new Scoreboard();
             board.setTitle(config2.getString("vote.title"));
             for (String key : config2.getConfigurationSection("vote.a").getKeys(false)) {
+            	list.add(config2.getString("vote.a."+key+".key"));
+            }
+            for (String key : config2.getConfigurationSection("vote.a").getKeys(false)) {
    			  vote2.put(config2.getString("vote.a."+key+".key"), config2.getInt("vote.a."+key+".value"));
-   			  list.add(config2.getString("vote.a."+key+".key"));
-   			  board.setScore(key+": "+config2.getString("vote.a."+key+".key"), list.size());
+   			  board.setScore(key+": "+config2.getString("vote.a."+key+".key")+" §e"+config2.getInt("vote.a."+key+".value")+"§a票", list.size()-Integer.parseInt(key));
             }
             if(config2.contains("vote.player")==false) {
-            	
+
             }else {
             for (String key : config2.getConfigurationSection("vote.player").getKeys(false)) {
             	UUID uuid = UUID.fromString(key);
             	playerState.put(uuid, config2.getInt("vote.player."+key));
             }
             }
-            config2.set("vote", null);
-            vote.saveConfig();
         }
 	}
     public class join implements Listener{
@@ -321,14 +306,14 @@ public class Man10vote extends JavaPlugin {
 		  }
           if (!playerState.isEmpty()) {
               if (playerState.get(p.getUniqueId()) != null && playerState.get(p.getUniqueId()).intValue()>=1) {
-        		  board.setShowPlayer(p); 
+        		  board.setShowPlayer(p);
                   return;
               }
           }
-		  p.sendMessage(prefix+"§a§l投票が行われています！=>§e§l"+board.getTitle()+" §a§l/mvote");
-		  board.setShowPlayer(p); 
+		  p.sendMessage(prefix+"§a§l投票が行われています！=>§e§l"+board.getTitle());
+		  board.setShowPlayer(p);
 		  return;
-    } 
+    }
     @EventHandler
     public void OnClick(InventoryClickEvent e){
     	Player p = (Player)e.getWhoClicked();
@@ -340,7 +325,18 @@ public class Man10vote extends JavaPlugin {
                 return;
             }
             if(e.getSlot()==0) {
+	              if (!playerState.isEmpty()) {
+	                    if (playerState.get(p.getUniqueId()) != null && playerState.get(p.getUniqueId()).intValue()>=1) {
+	                        p.sendMessage(prefix+"§4あなたはすでに投票しています！");
+	                    	e.setCancelled(true);
+	                    	e.getInventory().setItem(4, null);
+	                    	p.closeInventory();
+	                        return;
+	                    }
+	              }
             	e.setCancelled(true);
+            	e.getInventory().setItem(4, null);
+            	p.closeInventory();
             	int a =Integer.parseInt(e.getInventory().getItem(3).getItemMeta().getDisplayName())-1;
 	             String l = list.get(a);
 				  board.setShowPlayer(p);
@@ -348,15 +344,19 @@ public class Man10vote extends JavaPlugin {
 				  int c= board.getpoint(a+1+": "+l+" §e"+vote2.get(l)+"§a票");
 				  board.removeScores(a+1+": "+l+" §e"+vote2.get(l)+"§a票");
 				  vote2.put(l, i);
+				  config2.set("vote.a."+i+".value", i);
 				  board.setScore(a+1+": "+l+" §e"+vote2.get(l)+"§a票", c);
 				  playerState.put(p.getUniqueId(), a+1);
+	                config2.set("vote.player."+p.getUniqueId(), a+1);
+	                vote.saveConfig();
 				  p.sendMessage(prefix+"§2"+l+"§aに投票しました！");
-	   	            String runcom = config1.getString("voteuse").replace("<player_name>", p.getName());
+				  String[] run = config1.getString("voteuse").split(";");
+				    for(int ii =0; ii<run.length; ii++) {
+	   	            String runcom = run[ii].replace("<player_name>", p.getName());
 	            	ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
 	            	String comman = runcom;
 	            	Bukkit.dispatchCommand(console, comman);
-	            	e.getInventory().setItem(4, null);
-	            	p.closeInventory();
+				    }
             }
             if(e.getSlot()==8) {
             	p.closeInventory();
