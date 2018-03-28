@@ -33,7 +33,7 @@ public class Man10vote extends JavaPlugin {
 				  p.sendMessage(prefix + "§4現在投票は行われていません！");
 			  }else {
 				  p.sendMessage(prefix + "§a投票が行われています！ =>§e§l"+board.getTitle());
-				  p.sendMessage(prefix + "§e/mvote ○○ ==> ○○に投票");
+				  p.sendMessage(prefix + "§e/mkvote ○○ ==> ○○に投票");
 				  int l = list.size();
 				  for (int count = 1; count <= l; count++){
 					  int i = count-1;
@@ -103,13 +103,13 @@ public class Man10vote extends JavaPlugin {
 			        }
 				  if(args[0].equalsIgnoreCase("admin")) {
 				        if(args[1].equalsIgnoreCase("help")) {
-					     p.sendMessage("=======§6§lmvote§r=======");
-					     p.sendMessage(" /mvote ○○ ==> ○○に投票");
-					     p.sendMessage(" /mvote admin help ==> OP用ヘルプを確認(これ)");
-					     p.sendMessage(" /mvote new 投票内容 項目1 項目2 … ==> 投票を開始");
-					     p.sendMessage(" /mvote admin end ==> 投票を終了");
-					     p.sendMessage(" /mvote admin reload ==> configをリロード");
-					     p.sendMessage(" /mvote log ○○ ==> ログを確認");
+					     p.sendMessage("=======§c§lmkvote§r=======");
+					     p.sendMessage(" /mkvote ○○ ==> ○○に投票");
+					     p.sendMessage(" /mkvote admin help ==> OP用ヘルプを確認(これ)");
+					     p.sendMessage(" /mkvote new 投票内容 項目1 項目2 … ==> 投票を開始");
+					     p.sendMessage(" /mkvote admin end ==> 投票を終了");
+					     p.sendMessage(" /mkvote admin reload ==> configをリロード");
+					     p.sendMessage(" /mkvote log ○○ ==> ログを確認");
 					     p.sendMessage("=======§a§kaaa§6§l====v1.2.0====§a§kaaa§r=======");
 					     return true;
 				        } else if(args[1].equalsIgnoreCase("end")) {
@@ -146,10 +146,12 @@ public class Man10vote extends JavaPlugin {
 							  if(maxs==null) {
 								  maxs = "無し";
 							  }
-			   	            String runcom = config1.getString("voteend").replace("<win_name>", maxs);
-			            	ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
-			            	String comman = runcom;
-			            	Bukkit.dispatchCommand(console, comman);
+							  String[] run = config1.getString("voteend").replace("<win_name>", maxs).split(";");
+							    for(int ii =0; ii<run.length; ii++) {
+				            	ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
+				            	String comman = run[ii];
+				            	Bukkit.dispatchCommand(console, comman);
+							    }
 				    		vote2.clear();
 				    		playerState.clear();
 				        	board.remove();
@@ -213,9 +215,9 @@ public class Man10vote extends JavaPlugin {
 							  return true;
 						  }
 				        config2.set("vote.enable", "true");
-				        config2.set("vote.title", args[1].replace("&", "§")+": §e[/mvote]");
+				        config2.set("vote.title", args[1].replace("&", "§")+": §e[/mkvote]");
 					  board = new Scoreboard();
-					  board.setTitle(args[1].replace("&", "§")+": §e[/mvote]");
+					  board.setTitle(args[1].replace("&", "§")+": §e[/mkvote]");
 					  int i = 0;
 					  int l = args.length-2;
 					  for (int count = 2; count < args.length; count++){
@@ -237,7 +239,7 @@ public class Man10vote extends JavaPlugin {
 					  for (Player player : Bukkit.getOnlinePlayers()) {
 						  board.setShowPlayer(player);
 					  }
-					  Bukkit.broadcastMessage(prefix+"§a§l投票が開始されました！=>§e§l"+args[1]+" §e§l[/mvote]");
+					  Bukkit.broadcastMessage(prefix+"§a§l投票が開始されました！=>§e§l"+args[1].replace("&", "§")+" §e§l[/mkvote]");
 					  vote.saveConfig();
 					  return true;
 				  }
@@ -256,7 +258,7 @@ public class Man10vote extends JavaPlugin {
 	private HashMap<UUID,Integer> playerState;
 	private HashMap<String,Integer> vote2;
 	ArrayList<String> list;
-	String prefix = "§6§l[§a§lM§f§la§d§ln§f§l10§a§lvote§6§l]§r";
+	String prefix = "§6§l[§c§lMK§a§lvote§6§l]§r";
 	Scoreboard board;
 	Vote vote;
 	@Override
@@ -272,7 +274,7 @@ public class Man10vote extends JavaPlugin {
         playerState = new HashMap<>();
         vote2 = new HashMap<>();
         list = new ArrayList<>();
-        getCommand("mvote").setExecutor(this);
+        getCommand("mkvote").setExecutor(this);
 		super.onEnable();
         if(config2.getString("vote.enable").equals("true")==true) {
             board = new Scoreboard();

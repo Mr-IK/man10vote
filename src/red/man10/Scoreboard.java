@@ -8,7 +8,7 @@ import org.bukkit.scoreboard.Score;
 
 public class Scoreboard {
  
-    private static final String OBJECTIVE_NAME = "Man10vote";
+    private static final String OBJECTIVE_NAME = "MKvote";
 
     private org.bukkit.scoreboard.Scoreboard scoreboard;
     
